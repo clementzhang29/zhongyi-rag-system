@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>中医国学 · 经典问答</title>
+<style>
+:root{--ink:#2c2416;--ink-l:#5c4a32;--ink-m:#8a7a62;--ink-p:#b8a88a;--bg:#f7f3ed;--card:#fffcf7;--acc:#8B4513;--acc-h:#a0522d;--acc-gg:#c9b99a;--acc-s:#c4a882;--acc-w:#fdf6ed;--bd:#e6ddd0;--bd-l:#f0ebe0;--ff-think:"LXGW WenKai","KaiTi","STKaiti","Kai",serif;--sh:0 2px 20px rgba(44,36,22,.06);--sh-s:0 1px 4px rgba(44,36,22,.03);--r-s:8px;--r:14px;--r-l:20px;--mw:740px;--fs:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;--ff:"Noto Serif SC","Source Han Serif SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Georgia,serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:clamp(14px,1vw+10px,17px);-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
+body{font-family:var(--ff);background:var(--bg);color:var(--ink);min-height:100dvh;display:flex;flex-direction:column;line-height:1.8;overflow-x:hidden}
+.hd{background:linear-gradient(135deg,#5a2d1a,#7a3d22,#8B4513);color:#fff;padding:clamp(10px,2vw,16px) clamp(14px,3vw,28px);text-align:center;box-shadow:0 2px 16px rgba(44,36,22,.18);position:sticky;top:0;z-index:20;flex-shrink:0}
+.hd h1{font-size:clamp(1rem,3vw,1.4rem);font-weight:700;letter-spacing:.06em;font-family:var(--fs)}
+.hd .sub{font-size:clamp(.65rem,1.4vw,.78rem);opacity:.76;margin-top:3px;letter-spacing:.08em;font-family:var(--fs)}
+.cv{flex:1;overflow-y:auto;overflow-x:hidden;padding:clamp(14px,3vw,30px) clamp(8px,3vw,24px);display:flex;flex-direction:column;align-items:center;gap:clamp(16px,2.5vw,24px);scroll-behavior:smooth}
+.cv::-webkit-scrollbar{width:4px}.cv::-webkit-scrollbar-thumb{background:var(--acc-s);border-radius:4px}
+.mw{width:100%;max-width:var(--mw);display:flex;flex-direction:column}.mw.usr{align-items:flex-end}.mw.ai{align-items:flex-start}
+.mb{animation:fU .35s ease-out both;max-width:100%}
+.mw.usr .mb{background:var(--acc);color:#fff;padding:clamp(8px,1.5vw,12px) clamp(12px,2vw,18px);border-radius:18px 18px 4px 18px;font-size:clamp(.85rem,1.8vw,.93rem);line-height:1.6;box-shadow:var(--sh-s);max-width:min(85%,400px);word-break:break-word;font-family:var(--fs)}
+.mw.ai .mb{width:100%;background:var(--card);border-radius:var(--r-l);box-shadow:var(--sh);border:1px solid var(--bd);overflow:hidden}
+.mw.ai .cp{padding:clamp(18px,3vw,28px) clamp(16px,3vw,28px)}
+.wb{padding:clamp(20px,3vw,32px);text-align:center}.wg{font-size:clamp(1rem,2.2vw,1.15rem);font-weight:700;color:var(--ink);margin-bottom:6px;font-family:var(--fs)}
+.wd{font-size:clamp(.8rem,1.6vw,.88rem);color:var(--ink-l);line-height:1.7;margin-bottom:20px}
+.wh{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.whi{display:inline-block;padding:8px 14px;background:var(--acc-w);border:1px solid var(--bd);border-radius:var(--r-s);font-size:clamp(.72rem,1.4vw,.8rem);color:var(--ink-l);cursor:pointer;transition:all .2s ease;font-family:var(--fs)}
+.whi:hover{background:var(--acc);color:#fff;border-color:var(--acc);transform:translateY(-1px);box-shadow:0 2px 8px rgba(139,69,19,.2)}
+.tw-wrap{margin-bottom:14px;border-radius:var(--r);overflow:hidden;border:1px solid var(--acc-gg);background:#fcf9f4}
+.tw-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,#f5ede4,#fdf6ed);cursor:pointer;border-bottom:1px solid var(--acc-gg)}
+.tw-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--acc-w);border:1px solid var(--acc-gg)}
+.tw-title{font-size:clamp(.75rem,1.5vw,.82rem);font-weight:600;color:var(--acc);font-family:var(--fs);flex:1}.tw-toggle{font-size:.7rem;color:var(--ink-m);transition:transform .25s ease}.tw-toggle.open{transform:rotate(180deg)}
+.tw-body{padding:0 16px;max-height:0;overflow:hidden;transition:all .35s cubic-bezier(.4,0,.2,1)}.tw-body.open{max-height:520px;padding:14px 16px;overflow-y:auto}
+.tw-text{font-family:var(--ff-think);font-size:clamp(.78rem,1.5vw,.85rem);line-height:1.7;color:var(--ink-l);white-space:pre-wrap}
+.sec{margin:clamp(14px,2.5vw,20px) 0}.sech{display:flex;align-items:center;gap:clamp(6px,1.5vw,10px);margin-bottom:clamp(8px,1.5vw,12px);padding-bottom:clamp(6px,1vw,10px);border-bottom:1px solid var(--bd-l)}
+.sech .si{width:clamp(26px,4vw,30px);height:clamp(26px,4vw,30px);display:flex;align-items:center;justify-content:center;border-radius:8px;flex-shrink:0;font-size:clamp(1rem,2vw,1.15rem)}
+.sech .sl{font-size:clamp(.82rem,1.8vw,.92rem);font-weight:700;color:var(--ink);font-family:var(--fs)}
+.se .si{background:#fdf2e9;color:#c0392b}.sc .si{background:var(--acc-w);color:var(--acc)}.sd .si{background:#eaf2f8;color:#2c3e50}.sl2 .si{background:#eafaf1;color:#1e8449}.sr .si{background:#f4ecf7;color:#6c3483}
+.cb{margin:clamp(12px,2vw,16px) 0;background:var(--acc-w);border-radius:var(--r);border:1px solid var(--bd);overflow:hidden}
+.cbh{display:flex;align-items:center;gap:6px;padding:clamp(8px,1.5vw,11px) clamp(10px,2vw,14px);background:rgba(139,69,19,.04);border-bottom:1px solid var(--bd-l)}
+.cbk{font-size:clamp(.78rem,1.6vw,.85rem);font-weight:700;color:var(--acc);font-family:var(--fs)}.cbc{font-size:clamp(.7rem,1.4vw,.78rem);color:var(--ink-m)}
+.cbb{padding:clamp(10px,2vw,14px)}.cbo{font-size:clamp(.8rem,1.7vw,.88rem);color:var(--ink-l);line-height:1.8;padding:clamp(8px,1.5vw,10px) clamp(10px,2vw,14px);background:rgba(255,255,255,.65);border-radius:var(--r-s);border-left:3px solid var(--acc-s);margin-bottom:clamp(8px,1.5vw,10px)}
+.cbv{font-size:clamp(.78rem,1.5vw,.85rem);color:var(--ink-m);line-height:1.7;display:flex;gap:6px;align-items:flex-start}.cbv .vt{font-size:clamp(.65rem,1.2vw,.72rem);background:var(--acc);color:#fff;padding:1px 8px;border-radius:10px;flex-shrink:0;font-weight:600;font-family:var(--fs);margin-top:2px}
+.di{margin:clamp(12px,2vw,16px) 0}.dt{font-size:clamp(.86rem,1.7vw,.92rem);font-weight:700;color:var(--ink);margin-bottom:4px;font-family:var(--fs);display:flex;align-items:baseline;gap:6px}.dt::before{content:"";display:inline-block;width:5px;height:5px;background:var(--acc);border-radius:50%;flex-shrink:0}.db{font-size:clamp(.8rem,1.6vw,.88rem);color:var(--ink-l);line-height:1.75;padding-left:clamp(10px,1.5vw,14px)}
+.ap{font-size:clamp(.85rem,1.7vw,.92rem);color:var(--ink-l);line-height:1.8;margin:clamp(8px,1.5vw,10px) 0}.ap p{margin-bottom:.6em}
+.rb{margin:16px 0 0;padding:14px 16px;background:#f8f5f0;border-radius:var(--r);border:1px solid var(--bd)}.rbt{font-size:clamp(.78rem,1.5vw,.84rem);font-weight:700;color:var(--ink);margin-bottom:10px;font-family:var(--fs)}
+.rr{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--bd-l);align-items:flex-start}.rr:last-child{border-bottom:none}.rn{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;font-family:var(--fs);margin-top:2px}.ri2{flex:1;min-width:0}.rs{font-size:clamp(.75rem,1.4vw,.82rem);font-weight:600;color:var(--acc);margin-bottom:2px;font-family:var(--fs)}.rx{font-size:clamp(.7rem,1.3vw,.78rem);color:var(--ink-m);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.at{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)}
+.at button{height:32px;padding:0 12px;border:1px solid var(--bd);border-radius:8px;background:#fff;color:var(--ink-l);font:600 .78rem var(--fs);cursor:pointer}.at button:hover{border-color:var(--acc);color:var(--acc);background:#fffaf4}.at .ok{color:#2f7d46;border-color:#b9d9c2;background:#f6fff8}
+.ld{display:flex;align-items:center;gap:6px;padding:16px 20px;background:var(--card);border-radius:var(--r-l);box-shadow:var(--sh);border:1px solid var(--bd)}.ld span{width:8px;height:8px;border-radius:50%;background:var(--acc-s);animation:ldB 1.2s ease-in-out infinite}.ld span:nth-child(2){animation-delay:.15s}.ld span:nth-child(3){animation-delay:.3s}
+.ib{position:sticky;bottom:0;background:linear-gradient(0deg,var(--bg) 60%,transparent);padding:clamp(10px,2vw,14px) clamp(10px,3vw,20px) clamp(14px,2.5vw,20px);display:flex;gap:10px;flex-shrink:0;z-index:10}
+.ib input{flex:1;padding:clamp(10px,1.8vw,14px) clamp(14px,2.5vw,18px);border:2px solid var(--bd);border-radius:var(--r-l);font-size:clamp(.85rem,1.7vw,.92rem);font-family:var(--ff);outline:none;background:var(--card);color:var(--ink);transition:border-color .25s ease,box-shadow .25s ease}.ib input:focus{border-color:var(--acc-s);box-shadow:0 0 0 3px rgba(196,168,130,.15)}.ib input::placeholder{color:var(--ink-p)}
+.ib button{padding:clamp(10px,1.5vw,14px) clamp(16px,2.5vw,24px);background:linear-gradient(135deg,#8B4513,#a0522d);color:#fff;border:none;border-radius:var(--r-l);font-size:clamp(.85rem,1.7vw,.92rem);font-weight:600;font-family:var(--fs);cursor:pointer;transition:all .2s ease;white-space:nowrap}.ib button:hover{background:linear-gradient(135deg,#7a3d22,#8B4513);transform:translateY(-1px);box-shadow:0 3px 10px rgba(139,69,19,.25)}
+.typing-cursor{display:inline-block;width:2px;height:1.1em;background:var(--acc);margin-left:1px;vertical-align:text-bottom;animation:blink .8s step-end infinite}
+@keyframes fU{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes ldB{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}@keyframes blink{50%{opacity:0}}
+</style>
+</head>
+<body>
+<header class="hd"><h1>中医国学 · 经典问答</h1><div class="sub">本地典籍检索与问答验证</div></header>
+<div class="cv" id="cv">
+  <div class="mw ai"><div class="mb"><div class="cp wb">
+    <p class="wg">你好，我是你的国学典籍助手。</p>
+    <p class="wd">可以直接提问病机、方药、经典、养生。系统会检索至少 5 个不同文档来源，优先呈现古籍原文。</p>
+    <div class="wh">
+      <span class="whi" data-q="黄帝内经中如何理解脾胃">黄帝内经与脾胃</span>
+      <span class="whi" data-q="医宗金鉴里伤寒论注讲了什么">医宗金鉴与伤寒论注</span>
+      <span class="whi" data-q="金匮要略中如何看待虚劳">金匮要略与虚劳</span>
+      <span class="whi" data-q="临证指南医案中有哪些治风思路">临证指南医案治风</span>
+      <span class="whi" data-q="黄帝内经里有哪些养生原则">黄帝内经养生</span>
+    </div>
+  </div></div></div>
+</div>
+<div class="ib"><input id="qi" placeholder="输入问题后按回车发送" autofocus><button id="qb">发送</button></div>
+<script>
+const cv=document.getElementById("cv"),qi=document.getElementById("qi"),qb=document.getElementById("qb");
+const API_BASE=location.protocol==="file:"?"http://127.0.0.1:8000":"";
+let isLoading=false; window.answerStore={};
+function esc(text){const d=document.createElement("div");d.textContent=text||"";return d.innerHTML}
+function clean(text){return String(text||"").replace(/\*\*/g,"").trim()}
+function addUser(text){const w=document.createElement("div");w.className="mw usr";w.innerHTML='<div class="mb">'+esc(text)+'</div>';cv.appendChild(w);cv.scrollTop=cv.scrollHeight}
+function addLoading(){const w=document.createElement("div");w.className="mw ai";w.id="loading";w.innerHTML='<div class="ld"><span></span><span></span><span></span></div>';cv.appendChild(w);cv.scrollTop=cv.scrollHeight}
+function removeLoading(){const el=document.getElementById("loading");if(el)el.remove()}
+function thinkBox(refs){const n=(refs||[]).length;return '<div class="tw-wrap"><div class="tw-header"><span class="tw-icon">检</span><span class="tw-title">检索过程</span><span class="tw-toggle open">▼</span></div><div class="tw-body open"><div class="tw-text">已完成本地典籍检索。当前回答按相关度排序，并尽量优先展示古籍原著；近现代资料作为补充来源。\\n本次返回参考来源：'+n+' 条。</div></div></div>'}
+function sectionHeader(title){let icon="典",cls="sc";if(title.includes("精要")){icon="要";cls="se"}else if(title.includes("溯源")){icon="典";cls="sc"}else if(title.includes("阐释")){icon="释";cls="sd"}else if(title.includes("践行")){icon="行";cls="sl2"}else if(title.includes("阅读")){icon="阅";cls="sr"}return '<div class="sec '+cls+'"><div class="sech"><span class="si">'+icon+'</span><span class="sl">'+esc(title)+'</span></div>'}
+function renderTextBlock(text){return '<div class="ap"><p>'+esc(clean(text)).replace(/\n/g,"<br>")+'</p></div>'}
+function renderSections(answer){const lines=String(answer||"").split(/\n/);let html="",buf=[],open=false;function flush(){if(buf.length){html+=renderTextBlock(buf.join("\n"));buf=[]}}for(const raw of lines){const t=clean(raw);if(!t){buf.push("");continue}const isHead=/^(一句话精要|经典溯源|深度阐释|生活践行|延伸阅读)$/.test(t);if(isHead){flush();if(open)html+="</div>";html+=sectionHeader(t);open=true}else{buf.push(raw)}}flush();if(open)html+="</div>";return html||renderTextBlock(answer)}
+function renderRefs(refs){if(!refs||!refs.length)return "";let html='<div class="rb"><div class="rbt">参考来源</div>';refs.forEach((r,i)=>{const meta=(r.source_type?(" · "+esc(r.source_type)):"")+(r.score?(" · "+esc(String(r.score))):"");html+='<div class="rr"><span class="rn">'+(i+1)+'</span><div class="ri2"><div class="rs">《'+esc(r.book||"未知")+'》'+(r.chapter?(" · "+esc(r.chapter)):"")+meta+'</div><div class="rx">'+esc(r.excerpt||"")+'</div></div></div>'});return html+"</div>"}
+function actions(id){return '<div class="at"><button data-act="copy" data-id="'+id+'">一键复制</button><button data-act="md" data-id="'+id+'">导出 MD</button><button data-act="html" data-id="'+id+'">导出 HTML</button><button data-act="png" data-id="'+id+'">长图 PNG</button></div>'}
+function renderAnswer(answer,refs){const id="r"+Date.now()+Math.random().toString(16).slice(2);window.answerStore[id]={answer:String(answer||""),refs:refs||[]};const html=thinkBox(refs)+renderSections(answer)+renderRefs(refs)+actions(id);const w=document.createElement("div");w.className="mw ai";w.innerHTML='<div class="mb"><div class="cp" id="'+id+'">'+html+'</div></div>';cv.appendChild(w);bindThink(w);cv.scrollTop=cv.scrollHeight}
+function bindThink(root){root.querySelectorAll(".tw-header").forEach(h=>h.onclick=()=>{const b=h.nextElementSibling,t=h.querySelector(".tw-toggle");b.classList.toggle("open");t.classList.toggle("open")})}
+function asMarkdown(p){let out=p.answer.trim()+"\n\n## 参考来源\n";(p.refs||[]).forEach((r,i)=>{out+="\n"+(i+1)+". 《"+(r.book||"未知")+"》"+(r.chapter?" · "+r.chapter:"")+"\n";out+="   - 类型："+(r.source_type||"")+"  相关度："+(r.score||"")+"\n";out+="   - 摘录："+(r.excerpt||"").replace(/\s+/g," ").trim()+"\n"});return out.trim()+"\n"}
+function asHtml(p){return '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>检索结果</title><body style="font-family:Microsoft YaHei,serif;line-height:1.8;max-width:820px;margin:40px auto;color:#27221a;background:#fffdf8"><pre style="white-space:pre-wrap;font:16px/1.8 Microsoft YaHei,serif">'+esc(asMarkdown(p))+"</pre></body></html>"}
+function download(name,type,text){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function exportPng(p){const lines=asMarkdown(p).split("\n");const width=1200,pad=56,lineH=32;const canvas=document.createElement("canvas");canvas.width=width;canvas.height=Math.max(720,pad*2+lines.length*lineH);const ctx=canvas.getContext("2d");ctx.fillStyle="#fffdf8";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#2c2416";ctx.font="24px Microsoft YaHei";let y=pad;lines.forEach(line=>{let text=line||" ";while(ctx.measureText(text).width>width-pad*2){let cut=text.length-1;while(cut>0&&ctx.measureText(text.slice(0,cut)).width>width-pad*2)cut--;ctx.fillText(text.slice(0,cut),pad,y);text=text.slice(cut);y+=lineH}ctx.fillText(text,pad,y);y+=lineH});const a=document.createElement("a");a.href=canvas.toDataURL("image/png");a.download="检索结果.png";a.click()}
+document.addEventListener("click",async e=>{const btn=e.target.closest("button[data-act]");if(!btn)return;const p=window.answerStore[btn.dataset.id];if(!p)return;const act=btn.dataset.act;if(act==="copy"){await navigator.clipboard.writeText(asMarkdown(p));btn.classList.add("ok");btn.textContent="已复制";setTimeout(()=>{btn.classList.remove("ok");btn.textContent="一键复制"},1200)}if(act==="md")download("检索结果.md","text/markdown;charset=utf-8",asMarkdown(p));if(act==="html")download("检索结果.html","text/html;charset=utf-8",asHtml(p));if(act==="png")exportPng(p)})
+async function ask(q){if(!q||isLoading)return;isLoading=true;qb.disabled=true;addUser(q);qi.value="";addLoading();try{const res=await fetch(API_BASE+"/rag/query",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q})});const data=await res.json();removeLoading();if(!res.ok)renderAnswer("当前问答服务返回异常，请稍后重试。",[]);else renderAnswer(data.answer,data.references||[])}catch(e){removeLoading();renderAnswer("当前无法连接问答服务，请检查本地服务状态。",[])}isLoading=false;qb.disabled=false}
+qb.onclick=()=>ask(qi.value.trim());qi.addEventListener("keydown",e=>{if(e.key==="Enter")ask(qi.value.trim())});document.querySelectorAll(".whi").forEach(el=>el.onclick=()=>ask(el.getAttribute("data-q")));
+</script>
+</body>
+</html>

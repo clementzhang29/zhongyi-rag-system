@@ -1,0 +1,24 @@
+llm:
+  api_key: "YOUR_API_KEY_HERE"
+  base_url: "https://api.example.com/v1"
+  model: "YOUR_MODEL_NAME"
+  temperature: 0.3
+
+embedding:
+  model: "BAAI/bge-small-zh-v1.5"
+  device: "cpu"
+
+vector_db:
+  path: "./data/vector_db"
+
+documents:
+  path: "./data/books"
+
+retrieval:
+  top_k: 8
+  hybrid_weight: 0.5
+  rerank_enabled: true
+
+server:
+  host: "0.0.0.0"
+  port: 8000

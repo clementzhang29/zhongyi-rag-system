@@ -1,0 +1,40 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data files - 大文件排除
+data/books/*.pdf
+data/books/*.epub
+data/books/*.7z
+data/books/pdf_ocr/
+data/books/doc_extracts/
+data/books/mp3_transcripts/
+data/vector_db/
+
+# Logs
+*.log
+*.err
+*.out
+file_cleaner.err.log
+file_cleaner.out.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Config - 排除实际配置
+config.yaml
