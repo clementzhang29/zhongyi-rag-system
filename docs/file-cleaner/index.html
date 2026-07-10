@@ -651,12 +651,33 @@
       downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type:"application/json;charset=utf-8" }), "filtered_directory_snapshot.json");
       setStatus("已导出筛选快照 JSON。", true);
     }
+    function loadJson(url) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.overrideMimeType("application/json;charset=utf-8");
+        xhr.timeout = 60000;
+        xhr.onload = () => {
+          if (xhr.status < 200 || xhr.status >= 300) {
+            reject(new Error("HTTP " + xhr.status));
+            return;
+          }
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch (error) {
+            reject(error);
+          }
+        };
+        xhr.onerror = () => reject(new Error("??????"));
+        xhr.ontimeout = () => reject(new Error("????"));
+        xhr.send();
+      });
+    }
+
     async function loadDefaultSnapshot() {
       setStatus("正在加载内置目录快照...");
       try {
-        const res = await fetch(DEFAULT_SNAPSHOT, { cache:"no-store" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const payload = await res.json();
+        const payload = await loadJson(DEFAULT_SNAPSHOT + "?v=20260710");
         if (!payload.tree) throw new Error("快照格式不正确");
         resetData(payload.tree, "内置快照");
         setStatus(`已加载内置快照：${rootPath || "未提供根目录"}，共 ${flat.length - 1} 项`, true);
