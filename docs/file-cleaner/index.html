@@ -668,8 +668,8 @@
             reject(error);
           }
         };
-        xhr.onerror = () => reject(new Error("??????"));
-        xhr.ontimeout = () => reject(new Error("????"));
+        xhr.onerror = () => reject(new Error("Network request failed"));
+        xhr.ontimeout = () => reject(new Error("Request timed out"));
         xhr.send();
       });
     }
