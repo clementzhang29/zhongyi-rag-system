@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>文件目录整理器｜GitHub 协作筛选版</title>
+  <style>
+    :root {
+      --bg:#f4f6fb;
+      --panel:#fff;
+      --ink:#172033;
+      --muted:#667085;
+      --line:#d8dee9;
+      --soft:#eef4ff;
+      --accent:#1456d9;
+      --accent2:#0f766e;
+      --danger:#b42318;
+      --warn:#a15c00;
+      --shadow:0 14px 40px rgba(15,23,42,.08);
+      font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:linear-gradient(180deg,#f8fbff,#eef3fb); color:var(--ink); }
+    header {
+      padding:18px 24px;
+      color:#fff;
+      background:linear-gradient(135deg,#0f172a,#1d4ed8);
+      box-shadow:var(--shadow);
+    }
+    h1 { margin:0; font-size:21px; }
+    .sub { margin-top:8px; color:#dbeafe; font-size:13px; line-height:1.6; }
+    main {
+      max-width:1440px;
+      margin:0 auto;
+      padding:16px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 380px;
+      gap:16px;
+    }
+    .bar,.panel {
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:10px;
+      box-shadow:var(--shadow);
+    }
+    .bar {
+      grid-column:1/-1;
+      padding:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .notice {
+      grid-column:1/-1;
+      padding:10px 12px;
+      border:1px solid #fed7aa;
+      background:#fff7ed;
+      color:#9a3412;
+      border-radius:10px;
+      font-size:13px;
+      line-height:1.7;
+    }
+    button,input[type="text"] {
+      border:1px solid var(--line);
+      border-radius:7px;
+      padding:9px 12px;
+      font-size:14px;
+      background:#fff;
+      color:var(--ink);
+    }
+    button { cursor:pointer; }
+    button:hover { filter:brightness(.98); transform:translateY(-1px); }
+    button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+    button.secondary { background:var(--accent2); color:#fff; border-color:var(--accent2); }
+    button.warn { background:var(--warn); color:#fff; border-color:var(--warn); }
+    #search { width:260px; }
+    mark { background:#fde68a; color:#78350f; border-radius:3px; padding:0 2px; }
+    .tree-wrap { position:relative; min-width:0; }
+    .tree { padding:10px 0 16px; max-height:calc(100vh - 230px); overflow:auto; user-select:none; }
+    .row {
+      display:flex;
+      align-items:center;
+      gap:7px;
+      min-height:30px;
+      padding:3px 10px;
+      border-radius:7px;
+      margin:0 8px;
+    }
+    .row:hover { background:var(--soft); }
+    .row.box-hit { background:#e0f2fe; outline:1px solid #38bdf8; }
+    .indent { display:inline-block; flex:0 0 auto; }
+    .twisty { width:20px; height:20px; border:0; padding:0; background:transparent; color:var(--muted); }
+    .twisty.blank { visibility:hidden; }
+    input[type="checkbox"] { width:16px; height:16px; accent-color:var(--accent); }
+    .name { white-space:nowrap; cursor:pointer; }
+    .name:hover { color:var(--accent); text-decoration:underline; text-underline-offset:3px; }
+    .folder { font-weight:700; }
+    .badge {
+      font-size:11px;
+      color:var(--muted);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:1px 6px;
+      background:#fff;
+    }
+    .path {
+      color:var(--muted);
+      font-size:12px;
+      margin-left:6px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .selection-box {
+      display:none;
+      position:fixed;
+      z-index:20;
+      border:1px solid #2563eb;
+      background:rgba(37,99,235,.12);
+      pointer-events:none;
+      border-radius:4px;
+    }
+    .selection-box.active { display:block; }
+    aside { padding:14px; position:sticky; top:12px; max-height:calc(100vh - 24px); overflow:auto; }
+    aside h2 { margin:0 0 10px; font-size:16px; }
+    .stat {
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      padding:8px 0;
+      border-bottom:1px solid var(--line);
+      font-size:13px;
+    }
+    .preview {
+      margin-top:12px;
+      background:#0f172a;
+      color:#e5e7eb;
+      border-radius:9px;
+      padding:12px;
+      min-height:220px;
+      max-height:340px;
+      overflow:auto;
+      white-space:pre-wrap;
+      font-family:Consolas,"Courier New",monospace;
+      font-size:12px;
+      line-height:1.55;
+    }
+    .file-preview {
+      margin-top:12px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      overflow:hidden;
+      background:#fbfdff;
+    }
+    .file-preview-title { padding:10px 12px; border-bottom:1px solid var(--line); font-size:13px; font-weight:700; }
+    .file-preview-body { padding:12px; max-height:230px; overflow:auto; white-space:pre-wrap; font-size:12px; line-height:1.7; }
+    .tips {
+      margin-top:12px;
+      padding:10px 12px;
+      border:1px dashed var(--line);
+      border-radius:9px;
+      background:#fbfdff;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.75;
+    }
+    .status { grid-column:1/-1; color:var(--muted); font-size:13px; }
+    @media (max-width:980px) {
+      main { grid-template-columns:1fr; }
+      aside { position:static; max-height:none; }
+      .tree { max-height:none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>文件目录整理器｜GitHub 协作筛选版</h1>
+    <div class="sub">在 GitHub Pages 上导入目录快照 JSON，筛选需要的文件目录，再导出 MD 清单发回。本页面不上传原始文件，也不能直接移动你电脑上的文件。</div>
+  </header>
+  <main>
+    <div class="notice">
+      说明：GitHub Pages 是静态网页，不能扫描本地磁盘、不能执行 Windows BAT、不能直接整理本地文件。完整本地整理能力请运行 Python 版；本页面用于“协作者远程筛选目录快照”。
+    </div>
+    <section class="bar">
+      <button id="loadDefault" class="primary">加载内置中医书籍快照</button>
+      <button id="importSnapshot">导入快照 JSON</button>
+      <input id="snapshotFile" type="file" accept=".json" style="display:none">
+      <input id="search" type="text" placeholder="搜索文件或路径">
+      <button id="selectAll">全选</button>
+      <button id="clearAll">清空</button>
+      <button id="undoSelection">撤销选择</button>
+      <button id="redoSelection">重做选择</button>
+      <button id="expandAll">展开</button>
+      <button id="collapseAll">折叠</button>
+      <button id="exportMd" class="secondary">导出 MD 清单</button>
+      <button id="exportSnapshot">导出筛选快照 JSON</button>
+      <div id="status" class="status">等待加载目录快照。</div>
+    </section>
+    <section class="tree-wrap">
+      <div id="selectionBox" class="selection-box"></div>
+      <div class="panel tree" id="tree"></div>
+    </section>
+    <aside class="panel">
+      <h2>当前选择</h2>
+      <div class="stat"><span>已选目录</span><strong id="dirCount">0</strong></div>
+      <div class="stat"><span>已选文件</span><strong id="fileCount">0</strong></div>
+      <div class="stat"><span>估算大小</span><strong id="sizeCount">0 KB</strong></div>
+      <div class="stat"><span>当前模式</span><strong id="modeLabel">快照筛选</strong></div>
+      <div class="file-preview">
+        <div id="filePreviewTitle" class="file-preview-title">文件预览</div>
+        <div id="filePreviewBody" class="file-preview-body">点击文件名或路径，可在这里查看目录摘要或文件信息。GitHub 静态版不读取原文件内容。</div>
+      </div>
+      <h2 style="margin-top:14px;">MD 导出预览</h2>
+      <pre class="preview" id="preview"></pre>
+      <div class="tips">
+        快捷操作：<br>
+        - 勾选框/空白行：切换选择<br>
+        - 文件名/路径：右侧预览<br>
+        - Shift + 单击：范围连续选择<br>
+        - Ctrl + 单击：仅反转当前项<br>
+        - Alt + 单击目录：展开/折叠<br>
+        - 拖动行：连续勾选/取消，靠近边缘自动滚动<br>
+        - Ctrl + 拖动：逐项反选<br>
+        - Alt + 拖动任意行：矩形框选
+      </div>
+    </aside>
+  </main>
+  <script>
+    let rootPath = "";
+    let treeData = null;
+    let flat = [];
+    let byPath = new Map();
+    let state = new Map();
+    let collapsed = new Set();
+    let lastClickedPath = null;
+    let dragMode = null;
+    let dragValue = null;
+    let dragSeen = new Set();
+    let dragScrollTimer = null;
+    let dragScrollSpeed = 0;
+    let lastMousePoint = { x:0, y:0 };
+    let selectionUndoStack = [];
+    let selectionRedoStack = [];
+    let isRestoringSelection = false;
+    let boxSelect = null;
+
+    const DEFAULT_SNAPSHOT = "snapshots/directory_snapshot_zhongyi_20260709.json";
+
+    function setStatus(text, ok=false) {
+      const el = document.getElementById("status");
+      el.textContent = text;
+      el.style.color = ok ? "#047857" : "#667085";
+    }
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, ch => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[ch]));
+    }
+    function escapeRegExp(text) { return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+    function highlightText(text, term) {
+      const safe = escapeHtml(text);
+      if (!term) return safe;
+      return safe.replace(new RegExp("(" + escapeRegExp(term) + ")", "ig"), "<mark>$1</mark>");
+    }
+    function formatSize(bytes) {
+      if (!bytes) return "0 KB";
+      const units = ["B","KB","MB","GB","TB"];
+      let n = bytes, i = 0;
+      while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+      return (i === 0 ? n : n.toFixed(1)) + " " + units[i];
+    }
+    function walk(node, parent=null, depth=0) {
+      node.parent = parent;
+      node.depth = depth;
+      node._indeterminate = false;
+      flat.push(node);
+      byPath.set(node.path, node);
+      state.set(node.path, false);
+      (node.children || []).forEach(child => walk(child, node, depth + 1));
+    }
+    function resetData(data, modeText="快照筛选") {
+      treeData = data;
+      rootPath = data.root || "";
+      flat = [];
+      byPath = new Map();
+      state = new Map();
+      collapsed = new Set();
+      lastClickedPath = null;
+      selectionUndoStack = [];
+      selectionRedoStack = [];
+      walk(treeData);
+      document.getElementById("modeLabel").textContent = modeText;
+      render();
+      updatePreview();
+    }
+    function captureSelectionSnapshot() {
+      return {
+        checked: Array.from(state.entries()).filter(([, checked]) => checked === true).map(([path]) => path),
+        indeterminate: flat.filter(node => node._indeterminate).map(node => node.path)
+      };
+    }
+    function restoreSelectionSnapshot(snapshot) {
+      const checked = new Set(snapshot.checked || []);
+      const indeterminate = new Set(snapshot.indeterminate || []);
+      isRestoringSelection = true;
+      flat.forEach(node => {
+        state.set(node.path, checked.has(node.path));
+        node._indeterminate = indeterminate.has(node.path);
+      });
+      isRestoringSelection = false;
+      render();
+      updatePreview();
+    }
+    function withSelectionHistory(action, label="选择操作") {
+      if (!treeData || isRestoringSelection) return action();
+      const before = captureSelectionSnapshot();
+      action();
+      const after = captureSelectionSnapshot();
+      if (JSON.stringify(before) !== JSON.stringify(after)) {
+        selectionUndoStack.push({ before, after, label });
+        if (selectionUndoStack.length > 80) selectionUndoStack.shift();
+        selectionRedoStack = [];
+      }
+    }
+    function undoSelection() {
+      const item = selectionUndoStack.pop();
+      if (!item) return setStatus("暂无可撤销的选择操作。");
+      selectionRedoStack.push(item);
+      restoreSelectionSnapshot(item.before);
+      setStatus("已撤销选择：" + item.label, true);
+    }
+    function redoSelection() {
+      const item = selectionRedoStack.pop();
+      if (!item) return setStatus("暂无可重做的选择操作。");
+      selectionUndoStack.push(item);
+      restoreSelectionSnapshot(item.after);
+      setStatus("已重做选择：" + item.label, true);
+    }
+    function descendants(node) {
+      const list = [];
+      (node.children || []).forEach(child => { list.push(child); list.push(...descendants(child)); });
+      return list;
+    }
+    function isIndeterminate(node) { return !!node._indeterminate; }
+    function setNode(node, checked) {
+      state.set(node.path, checked);
+      descendants(node).forEach(child => {
+        state.set(child.path, checked);
+        child._indeterminate = false;
+      });
+      updateParents(node.parent);
+    }
+    function setNodeOnly(node, checked) {
+      state.set(node.path, checked);
+      node._indeterminate = false;
+      updateParents(node.parent);
+    }
+    function updateParents(node) {
+      while (node) {
+        const children = node.children || [];
+        if (!children.length) { node = node.parent; continue; }
+        const all = children.every(child => state.get(child.path) === true && !isIndeterminate(child));
+        const any = children.some(child => state.get(child.path) === true || isIndeterminate(child));
+        state.set(node.path, all);
+        node._indeterminate = any && !all;
+        node = node.parent;
+      }
+    }
+    function isVisible(node, term) {
+      if (!term) return true;
+      const hay = (node.name + " " + node.path).toLowerCase();
+      if (hay.includes(term)) return true;
+      return (node.children || []).some(child => isVisible(child, term));
+    }
+    function visibleRows() {
+      const term = document.getElementById("search").value.trim().toLowerCase();
+      return flat.filter(node => {
+        if (node.path === ".") return false;
+        if (!isVisible(node, term)) return false;
+        if (!term) {
+          let ancestor = node.parent;
+          while (ancestor && ancestor.path !== ".") {
+            if (collapsed.has(ancestor.path)) return false;
+            ancestor = ancestor.parent;
+          }
+        }
+        return true;
+      });
+    }
+    function toggleNode(node, event, checkedOverride=null) {
+      if (!isRestoringSelection) return withSelectionHistory(() => toggleNodeRaw(node, event, checkedOverride), "切换选择");
+      return toggleNodeRaw(node, event, checkedOverride);
+    }
+    function toggleNodeRaw(node, event, checkedOverride=null) {
+      const checked = checkedOverride === null ? !(state.get(node.path) === true) : checkedOverride;
+      if (event && event.altKey && node.type === "dir") {
+        collapsed.has(node.path) ? collapsed.delete(node.path) : collapsed.add(node.path);
+        render();
+        return;
+      }
+      if (event && event.shiftKey && lastClickedPath && byPath.has(lastClickedPath)) {
+        const rows = visibleRows();
+        const start = rows.findIndex(n => n.path === lastClickedPath);
+        const end = rows.findIndex(n => n.path === node.path);
+        if (start !== -1 && end !== -1) {
+          rows.slice(Math.min(start,end), Math.max(start,end)+1).forEach(item => setNodeOnly(item, checked));
+          lastClickedPath = node.path;
+          render(); updatePreview(); return;
+        }
+      }
+      if (event && event.ctrlKey) setNodeOnly(node, checked);
+      else setNode(node, checked);
+      lastClickedPath = node.path;
+      render(); updatePreview();
+    }
+    function render() {
+      const box = document.getElementById("tree");
+      box.innerHTML = "";
+      if (!treeData) return;
+      const rawTerm = document.getElementById("search").value.trim();
+      visibleRows().forEach(node => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.dataset.path = node.path;
+        const indent = document.createElement("span");
+        indent.className = "indent";
+        indent.style.width = (node.depth * 20) + "px";
+        row.appendChild(indent);
+        const twisty = document.createElement("button");
+        twisty.className = "twisty" + (node.type === "dir" ? "" : " blank");
+        twisty.textContent = node.type === "dir" ? (collapsed.has(node.path) ? "▶" : "▼") : "·";
+        twisty.onclick = e => { e.stopPropagation(); collapsed.has(node.path) ? collapsed.delete(node.path) : collapsed.add(node.path); render(); };
+        row.appendChild(twisty);
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = state.get(node.path) === true;
+        cb.indeterminate = isIndeterminate(node);
+        cb.onchange = e => toggleNode(node, e, cb.checked);
+        row.appendChild(cb);
+        const name = document.createElement("span");
+        name.className = "name previewable " + (node.type === "dir" ? "folder" : "file");
+        name.innerHTML = escapeHtml(node.type === "dir" ? "📁 " : "📄 ") + highlightText(node.name, rawTerm);
+        name.onclick = e => { e.stopPropagation(); loadNodePreview(node); };
+        row.appendChild(name);
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = node.type === "dir" ? (node.children || []).length + "项" : formatSize(node.size || 0);
+        row.appendChild(badge);
+        const path = document.createElement("span");
+        path.className = "path";
+        path.innerHTML = highlightText(node.path, rawTerm);
+        path.onclick = e => { e.stopPropagation(); loadNodePreview(node); };
+        row.appendChild(path);
+        row.onmousedown = e => {
+          if (e.button !== 0) return;
+          if (e.target.closest("button,input,.previewable")) return;
+          if (e.altKey) return;
+          dragMode = e.ctrlKey ? "invert" : "paint";
+          dragValue = !(state.get(node.path) === true);
+          dragSeen = new Set();
+          applyDragNode(node);
+        };
+        row.onmouseenter = () => { if (dragMode) applyDragNode(node); };
+        box.appendChild(row);
+      });
+    }
+    function applyDragNode(node) {
+      if (!node || dragSeen.has(node.path)) return;
+      dragSeen.add(node.path);
+      if (dragMode === "invert") toggleNode(node, { ctrlKey:true }, !(state.get(node.path) === true));
+      else if (dragMode === "paint") toggleNode(node, { ctrlKey:true }, dragValue);
+    }
+    function rectsIntersect(a, b) {
+      return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+    }
+    function updateSelectionBoxVisual() {
+      const box = document.getElementById("selectionBox");
+      if (!boxSelect || !box) return;
+      const left = Math.min(boxSelect.startX, boxSelect.currentX);
+      const top = Math.min(boxSelect.startY, boxSelect.currentY);
+      box.classList.add("active");
+      box.style.left = left + "px";
+      box.style.top = top + "px";
+      box.style.width = Math.abs(boxSelect.currentX - boxSelect.startX) + "px";
+      box.style.height = Math.abs(boxSelect.currentY - boxSelect.startY) + "px";
+    }
+    function applyBoxSelectionPreview() {
+      if (!boxSelect) return;
+      updateSelectionBoxVisual();
+      const rect = {
+        left: Math.min(boxSelect.startX, boxSelect.currentX),
+        right: Math.max(boxSelect.startX, boxSelect.currentX),
+        top: Math.min(boxSelect.startY, boxSelect.currentY),
+        bottom: Math.max(boxSelect.startY, boxSelect.currentY)
+      };
+      document.querySelectorAll(".row.box-hit").forEach(row => row.classList.remove("box-hit"));
+      boxSelect.paths = [];
+      document.querySelectorAll(".row").forEach(row => {
+        if (rectsIntersect(rect, row.getBoundingClientRect())) {
+          row.classList.add("box-hit");
+          if (row.dataset.path) boxSelect.paths.push(row.dataset.path);
+        }
+      });
+    }
+    function startBoxSelection(event) {
+      if (event.button !== 0) return;
+      if (event.target.closest("button,input,textarea,select")) return;
+      if (event.target.closest(".row") && !event.altKey) return;
+      boxSelect = {
+        startX:event.clientX,
+        startY:event.clientY,
+        currentX:event.clientX,
+        currentY:event.clientY,
+        mode:event.ctrlKey ? "invert" : (event.shiftKey ? "add" : "replace"),
+        paths:[]
+      };
+      event.preventDefault();
+      applyBoxSelectionPreview();
+    }
+    function moveBoxSelection(event) {
+      if (!boxSelect) return;
+      boxSelect.currentX = event.clientX;
+      boxSelect.currentY = event.clientY;
+      applyBoxSelectionPreview();
+    }
+    function finishBoxSelection() {
+      if (!boxSelect) return;
+      const selectedPaths = Array.from(new Set(boxSelect.paths || []));
+      const mode = boxSelect.mode;
+      const label = `框选 ${selectedPaths.length} 项`;
+      document.getElementById("selectionBox").classList.remove("active");
+      document.querySelectorAll(".row.box-hit").forEach(row => row.classList.remove("box-hit"));
+      boxSelect = null;
+      if (!selectedPaths.length) return;
+      withSelectionHistory(() => {
+        if (mode === "replace") flat.forEach(node => { state.set(node.path, false); node._indeterminate = false; });
+        selectedPaths.forEach(path => {
+          const node = byPath.get(path);
+          if (!node) return;
+          const checked = mode === "invert" ? !(state.get(node.path) === true) : true;
+          setNodeOnly(node, checked);
+        });
+        render(); updatePreview();
+      }, label);
+    }
+    function updateDragAutoScroll(event) {
+      if (!dragMode) return;
+      lastMousePoint = { x:event.clientX, y:event.clientY };
+      const tree = document.getElementById("tree");
+      const rect = tree.getBoundingClientRect();
+      const edge = 64;
+      if (event.clientY < rect.top + edge) dragScrollSpeed = -18;
+      else if (event.clientY > rect.bottom - edge) dragScrollSpeed = 18;
+      else dragScrollSpeed = 0;
+      if (!dragScrollTimer) {
+        dragScrollTimer = setInterval(() => {
+          if (!dragMode || dragScrollSpeed === 0) return;
+          tree.scrollTop += dragScrollSpeed;
+          const element = document.elementFromPoint(lastMousePoint.x, lastMousePoint.y);
+          const row = element ? element.closest(".row") : null;
+          if (row && row.dataset.path && byPath.has(row.dataset.path)) applyDragNode(byPath.get(row.dataset.path));
+        }, 45);
+      }
+    }
+    document.addEventListener("mouseup", () => {
+      dragMode = null;
+      dragValue = null;
+      dragSeen = new Set();
+      dragScrollSpeed = 0;
+      if (dragScrollTimer) { clearInterval(dragScrollTimer); dragScrollTimer = null; }
+      finishBoxSelection();
+    });
+    document.addEventListener("mousemove", updateDragAutoScroll);
+    document.addEventListener("mousemove", moveBoxSelection);
+
+    function selectedNodes() {
+      return flat.filter(node => node.path !== "." && state.get(node.path) === true && !isIndeterminate(node));
+    }
+    function selectedFiles() {
+      return flat.filter(node => node.type === "file" && state.get(node.path) === true);
+    }
+    function buildMarkdown() {
+      const files = selectedFiles();
+      const dirs = selectedNodes().filter(n => n.type === "dir");
+      const size = files.reduce((sum, n) => sum + (n.size || 0), 0);
+      const selectedSet = new Set(selectedNodes().map(n => n.path));
+      let md = "# 知识库文件筛选清单\n\n";
+      md += `生成时间：${new Date().toLocaleString("zh-CN")}\n\n`;
+      md += `快照根目录：${rootPath || "未提供"}\n\n`;
+      md += `已选目录：${dirs.length} 个\n\n`;
+      md += `已选文件：${files.length} 个\n\n`;
+      md += `估算大小：${formatSize(size)}\n\n`;
+      md += "## 分级目录\n\n";
+      flat.forEach(node => {
+        if (node.path === "." || !selectedSet.has(node.path)) return;
+        const prefix = "  ".repeat(Math.max(0, node.depth - 1));
+        const mark = node.type === "dir" ? "- [目录]" : "- [文件]";
+        const extra = node.type === "file" ? ` (${formatSize(node.size || 0)})` : "";
+        md += `${prefix}${mark} ${node.name}${extra}\n`;
+      });
+      md += "\n## 文件路径清单\n\n";
+      files.forEach(node => { md += `- ${node.path}\n`; });
+      return md;
+    }
+    function updatePreview() {
+      const files = selectedFiles();
+      const dirs = selectedNodes().filter(n => n.type === "dir");
+      const size = files.reduce((sum, n) => sum + (n.size || 0), 0);
+      document.getElementById("dirCount").textContent = dirs.length;
+      document.getElementById("fileCount").textContent = files.length;
+      document.getElementById("sizeCount").textContent = formatSize(size);
+      document.getElementById("preview").textContent = treeData ? buildMarkdown() : "请先加载或导入目录快照。";
+    }
+    function loadNodePreview(node) {
+      document.getElementById("filePreviewTitle").textContent = "预览：" + node.name;
+      if (node.type === "dir") {
+        const dirs = (node.children || []).filter(child => child.type === "dir").length;
+        const files = (node.children || []).filter(child => child.type === "file").length;
+        document.getElementById("filePreviewBody").textContent = `目录：${node.name}\n相对路径：${node.path}\n子目录：${dirs} 个\n文件：${files} 个\n\nGitHub 版只显示快照信息，不读取原文件内容。`;
+      } else {
+        document.getElementById("filePreviewBody").textContent = `文件：${node.name}\n相对路径：${node.path}\n大小：${formatSize(node.size || 0)}\n\nGitHub 版只显示快照信息，不读取原文件内容。`;
+      }
+    }
+    function cleanTreeForExport(node) {
+      const clean = { name:node.name, path:node.path, type:node.type };
+      if (typeof node.size === "number") clean.size = node.size;
+      if (node.root) clean.root = node.root;
+      if (node.children) clean.children = node.children.map(child => cleanTreeForExport(child));
+      return clean;
+    }
+    function downloadBlob(blob, name) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+    function exportMd() {
+      if (!treeData) return setStatus("请先加载目录快照。");
+      downloadBlob(new Blob([buildMarkdown()], { type:"text/markdown;charset=utf-8" }), "knowledge_selection.md");
+      setStatus("已导出 MD 清单，请查看浏览器下载列表。", true);
+    }
+    function exportSnapshot() {
+      if (!treeData) return setStatus("请先加载目录快照。");
+      const payload = {
+        meta: { exportedAt:new Date().toISOString(), root:rootPath, app:"文件目录整理器 GitHub 协作筛选版" },
+        tree: cleanTreeForExport(treeData),
+        selection: selectedNodes().map(node => node.path)
+      };
+      downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type:"application/json;charset=utf-8" }), "filtered_directory_snapshot.json");
+      setStatus("已导出筛选快照 JSON。", true);
+    }
+    async function loadDefaultSnapshot() {
+      setStatus("正在加载内置目录快照...");
+      try {
+        const res = await fetch(DEFAULT_SNAPSHOT, { cache:"no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const payload = await res.json();
+        if (!payload.tree) throw new Error("快照格式不正确");
+        resetData(payload.tree, "内置快照");
+        setStatus(`已加载内置快照：${rootPath || "未提供根目录"}，共 ${flat.length - 1} 项`, true);
+      } catch (err) {
+        setStatus("加载内置快照失败，请使用“导入快照 JSON”：" + err.message);
+      }
+    }
+    async function importSnapshotFile(file) {
+      const text = await file.text();
+      const payload = JSON.parse(text);
+      if (!payload.tree) throw new Error("快照文件格式不正确");
+      resetData(payload.tree, "导入快照");
+      setStatus(`已导入快照：${file.name}，共 ${flat.length - 1} 项`, true);
+    }
+
+    document.getElementById("loadDefault").onclick = loadDefaultSnapshot;
+    document.getElementById("importSnapshot").onclick = () => document.getElementById("snapshotFile").click();
+    document.getElementById("snapshotFile").onchange = async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try { await importSnapshotFile(file); }
+      catch (err) { setStatus("导入快照失败：" + err.message); }
+      finally { e.target.value = ""; }
+    };
+    document.getElementById("search").oninput = render;
+    document.getElementById("selectAll").onclick = () => { if (!treeData) return; withSelectionHistory(() => { setNode(treeData, true); render(); updatePreview(); }, "全选"); };
+    document.getElementById("clearAll").onclick = () => { if (!treeData) return; withSelectionHistory(() => { flat.forEach(n => { state.set(n.path, false); n._indeterminate = false; }); render(); updatePreview(); }, "清空"); };
+    document.getElementById("undoSelection").onclick = undoSelection;
+    document.getElementById("redoSelection").onclick = redoSelection;
+    document.getElementById("expandAll").onclick = () => { collapsed.clear(); render(); };
+    document.getElementById("collapseAll").onclick = () => { if (!treeData) return; flat.filter(n => n.type === "dir" && n.path !== ".").forEach(n => collapsed.add(n.path)); render(); };
+    document.getElementById("exportMd").onclick = exportMd;
+    document.getElementById("exportSnapshot").onclick = exportSnapshot;
+    document.getElementById("tree").onmousedown = startBoxSelection;
+    updatePreview();
+    loadDefaultSnapshot();
+  </script>
+</body>
+</html>

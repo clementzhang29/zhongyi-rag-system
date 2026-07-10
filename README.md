@@ -1,6 +1,18 @@
-﻿# 中医国学 RAG 系统
+# 中医国学 RAG 系统
 
 基于检索增强生成(RAG)的中医国学知识问答系统。
+
+## 在线文件整理器
+
+GitHub 协作筛选版文件整理器：
+
+https://clementzhang29.github.io/zhongyi-rag-system/file-cleaner/
+
+说明：GitHub Pages 只能运行静态网页，适合“导入目录快照 JSON → 筛选文件目录 → 导出 MD 清单”。如果需要扫描本机目录、预览本地文件、生成 BAT 或移动文件，请运行本地 Python 版：
+
+```bash
+python tools/file_cleaner_app.py
+```
 
 ## 快速开始
 
